@@ -5,6 +5,8 @@ This file is the GUI on top of the game backend.
 
 BACKGROUND = 'game/images/ramin.jpg'
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+BACKGROUND_COLOR = (219, 186, 130)
 
 
 def get_rbg(color):
@@ -34,6 +36,9 @@ class UI:
         # Pass button
         self.pass_button = None
         self.pass_text = None
+        
+        # Timer
+        self.timer_rect = pygame.Rect(self.margin + self.board_pixels + 20, 20, 130, 40)
 
     def initialize(self):
         """Initialize the game board."""
@@ -159,7 +164,7 @@ class UI:
         
         pygame.display.update()
 
-    def draw_game_state(self, current_player, board):
+    def draw_game_state(self, current_player, board, time_left):
         """Draw game state information including current player, scores, and pass button"""
         # Clear the info area
         info_rect = pygame.Rect(self.margin + self.board_pixels + 20, self.margin, 180, 200)
@@ -188,7 +193,29 @@ class UI:
             pass_count = self.font.render(f"Passes: {board.passes}", True, (200, 0, 0))
             self.screen.blit(pass_count, (self.margin + self.board_pixels + 30, self.margin + 100))
         
+        # Draw timer
+        self.draw_timer(time_left)
+        
         pygame.display.update()
+
+    def draw_timer(self, time_left):
+        """Draw the countdown timer."""
+        # Clear previous timer
+        pygame.draw.rect(self.screen, (255, 255, 255), self.timer_rect)
+        pygame.draw.rect(self.screen, BLACK, self.timer_rect, 2)
+        
+        # Choose color based on remaining time
+        if time_left > 5:
+            color = (34, 139, 34)  # Green
+        elif time_left > 2:
+            color = (255, 165, 0)  # Yellow
+        else:
+            color = (255, 0, 0)  # Red
+        
+        # Draw timer text
+        timer_text = self.font.render(f'Time: {int(time_left)}s', True, color)
+        text_rect = timer_text.get_rect(center=self.timer_rect.center)
+        self.screen.blit(timer_text, text_rect)
 
     def show_game_over(self, black_score, white_score, board):
         """Display game over screen with final scores and details"""

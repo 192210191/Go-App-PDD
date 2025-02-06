@@ -20,6 +20,11 @@ class Match:
         self.board_size = self._select_board_size()
         self.board = Board(board_size=self.board_size, next_color='BLACK')
         self.ui = UI(board_size=self.board_size)
+        
+        # Timer settings
+        self.turn_timer = 10  # 10 seconds per turn
+        self.timer_start = None
+        self.game_over = False
 
     @property
     def winner(self):
@@ -84,12 +89,23 @@ class Match:
         """Start the game with GUI for human players."""
         self.ui.initialize()
         self.time_elapsed = time.time()
+        self.timer_start = time.time()
         
         # Main game loop
         game_ended = False
         while True:
+            current_time = time.time()
+            time_left = max(0, self.turn_timer - (current_time - self.timer_start))
+            
+            # Handle timer expiration
+            if time_left == 0:
+                pygame.display.set_caption('Go Game - Time\'s Up!')
+                self.board.pass_move()
+                self.timer_start = time.time()
+                continue
+            
             # Update game state display
-            self.ui.draw_game_state(self.board.next, self.board)
+            self.ui.draw_game_state(self.board.next, self.board, time_left)
             
             # Handle events
             for event in pygame.event.get():
@@ -105,6 +121,7 @@ class Match:
                         game_ended = self.board.pass_move()
                         if game_ended:
                             self._show_game_result()
+                        self.timer_start = time.time()
                         continue
                     
                     # Handle board clicks
@@ -123,6 +140,7 @@ class Match:
                             
                             # Then draw the new stone
                             self.ui.draw(point, opponent_color(self.board.next))
+                            self.timer_start = time.time()
             
             pygame.display.update()
             

@@ -11,7 +11,7 @@ The following AI agents are also provided:
 * Expectimax search agent
 * Approximate Q-learning agent
 
-<img src="img/Board.jpg" alt="Board" width="450" align="middle"/>
+<img src="img/game.jpg.png" alt="Board" width="450" align="middle"/>
 
 ### Usage
 
