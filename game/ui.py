@@ -38,7 +38,11 @@ class UI:
         self.pass_text = None
         
         # Timer
-        self.timer_rect = pygame.Rect(self.margin + self.board_pixels + 20, 20, 130, 40)
+        timer_width = 100
+        timer_height = 35
+        timer_x = self.margin + self.board_pixels + 30
+        timer_y = self.margin + 130  # Position it below other game info
+        self.timer_rect = pygame.Rect(timer_x, timer_y, timer_width, timer_height)
 
     def initialize(self):
         """Initialize the game board."""
@@ -103,10 +107,30 @@ class UI:
         return (self.margin - 20 + point[0] * self.cell_size, 
                 self.margin - 20 + point[1] * self.cell_size)
 
-    def draw(self, point, color, size=18):
-        """Draw a stone at the specified intersection."""
+    def draw(self, point, color, size=15):
+        """Draw a stone at the specified intersection with a growing animation effect."""
         rgb_color = get_rbg(color)
         position = self.coords(point)
+        
+        # Animate stone placement with growing effect
+        for r in range(5, size + 1, 2):
+            pygame.draw.circle(self.screen, rgb_color, position, r, 0)
+            pygame.display.update()
+            pygame.time.wait(10)  # Short delay for smooth animation
+            
+            # If not at final size, clear the previous circle
+            if r < size:
+                # Draw a slightly larger circle in background color to clean up
+                pygame.draw.circle(self.screen, BACKGROUND_COLOR, position, r + 1, 0)
+                
+                # Redraw the grid lines that might have been covered
+                # Get the grid area around the stone
+                area_rect = pygame.Rect(position[0] - r - 1, position[1] - r - 1, 
+                                      (r + 1) * 2, (r + 1) * 2)
+                stone_area = self.background.subsurface(area_rect).copy()
+                self.screen.blit(stone_area, area_rect)
+        
+        # Draw final stone
         pygame.draw.circle(self.screen, rgb_color, position, size, 0)
         pygame.display.update()
 

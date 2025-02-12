@@ -94,6 +94,7 @@ class Board(object):
         self.last_board_state = None  # For ko rule checking
         self.passes = 0  # Count consecutive passes for game end
         self.captured_stones = {'BLACK': 0, 'WHITE': 0}  # Count captured stones
+        self.passes_count = {'BLACK': 0, 'WHITE': 0}  # Track total passes per player
 
         # Set komi to 6.5 for all board sizes
         self.komi = 6.5
@@ -183,9 +184,16 @@ class Board(object):
     def pass_move(self):
         """Pass the current turn."""
         self.passes += 1
+        self.passes_count[self.next] += 1
+        
+        # Check if current player has reached 3 passes
+        if self.passes_count[self.next] >= 3:
+            self.winner = opponent_color(self.next)
+            return True
+            
         self.next = self._get_opponent_color()
         self.ko_point = None
-        return self.passes >= 2  # Return True if game should end
+        return self.passes >= 2  # Return True if game should end due to consecutive passes
 
     def get_score(self):
         """Calculate the score using territory scoring rules."""
