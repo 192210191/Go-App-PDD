@@ -243,16 +243,19 @@ class UI:
 
     def show_game_over(self, black_score, white_score, board):
         """Display game over screen with final scores and details"""
-        # Create semi-transparent overlay
+        # Create a new blank screen
+        self.screen.fill((240, 240, 240))  # Light gray background
+        
+        # Create semi-transparent overlay for better text visibility
         overlay = pygame.Surface((self.screen.get_width(), self.screen.get_height()))
         overlay.fill((255, 255, 255))
         overlay.set_alpha(128)
         self.screen.blit(overlay, (0, 0))
         
-        # Create game over text
-        game_over_font = pygame.font.SysFont('Arial', 36)
-        score_font = pygame.font.SysFont('Arial', 24)
-        detail_font = pygame.font.SysFont('Arial', 20)
+        # Create game over text with slightly larger fonts
+        game_over_font = pygame.font.SysFont('Arial', 42)
+        score_font = pygame.font.SysFont('Arial', 28)
+        detail_font = pygame.font.SysFont('Arial', 22)
         
         # Create text surfaces
         game_over_text = game_over_font.render("Game Over!", True, (0, 0, 0))
@@ -269,30 +272,47 @@ class UI:
         
         winner = "Black" if black_score > white_score else "White"
         margin = abs(black_score - white_score)
-        winner_text = score_font.render(f" Winner: {winner} by {margin:.1f} points!", True, (0, 100, 0))
+        winner_text = score_font.render(f"Winner: {winner} by {margin:.1f} points!", True, (0, 100, 0))
         
         # Position text in center of screen
         center_x = self.screen.get_width() // 2
         center_y = self.screen.get_height() // 2
         
-        # Draw all text elements
+        # Draw all text elements with improved spacing
         self.screen.blit(game_over_text, 
-                        game_over_text.get_rect(centerx=center_x, centery=center_y - 80))
+                        game_over_text.get_rect(centerx=center_x, centery=center_y - 100))
         
         # Black score
         self.screen.blit(black_score_text, 
-                        black_score_text.get_rect(centerx=center_x, centery=center_y - 20))
+                        black_score_text.get_rect(centerx=center_x, centery=center_y - 40))
         self.screen.blit(black_detail, 
-                        black_detail.get_rect(centerx=center_x, centery=center_y))
+                        black_detail.get_rect(centerx=center_x, centery=center_y - 10))
         
         # White score
         self.screen.blit(white_score_text, 
                         white_score_text.get_rect(centerx=center_x, centery=center_y + 40))
         self.screen.blit(white_detail, 
-                        white_detail.get_rect(centerx=center_x, centery=center_y + 60))
+                        white_detail.get_rect(centerx=center_x, centery=center_y + 70))
         
         # Winner
         self.screen.blit(winner_text, 
-                        winner_text.get_rect(centerx=center_x, centery=center_y + 100))
+                        winner_text.get_rect(centerx=center_x, centery=center_y + 120))
+        
+        # Add exit instruction
+        exit_text = detail_font.render("Click anywhere to exit", True, (100, 100, 100))
+        self.screen.blit(exit_text, 
+                        exit_text.get_rect(centerx=center_x, bottom=self.screen.get_height() - 30))
         
         pygame.display.update()
+        
+        # Wait for click to exit
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    waiting = False
+                    pygame.quit()
+                    return

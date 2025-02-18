@@ -195,9 +195,14 @@ class Match:
 
         time_elapsed = time.time() - self.timer_start
         if time_elapsed >= self.turn_timer:
-            # Time's up - count as a pass
+            # Time's up - count as a pass and increment pass count
             game_ended = self.board.pass_move()
             self.timer_start = time.time()  # Reset timer for next player
+            
+            # Display updated pass counts
+            self._display_pass_counts()
+            pygame.display.update()
+            
             return game_ended
         return False
 
